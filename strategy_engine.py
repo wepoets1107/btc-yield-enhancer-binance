@@ -24,7 +24,10 @@ from datetime import datetime, timezone, timedelta
 from statistics import stdev
 from typing import Optional
 
-from deribit_ws import DeribitWSClient
+try:
+    from deribit_ws import DeribitWSClient
+except ImportError:
+    DeribitWSClient = None  # 交易所原生WS由交易所模块实现，非必选
 
 logger = logging.getLogger(__name__)
 

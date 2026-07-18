@@ -29,7 +29,6 @@ from flask_sock import Sock
 
 from strategy_engine import StrategyEngine
 from binance_api import BinanceClient
-from deribit_api import DeribitClient
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,7 +60,7 @@ BINANCE_API_KEY = os.environ.get("BINANCE_API_KEY", "")
 BINANCE_API_SECRET = os.environ.get("BINANCE_API_SECRET", "")
 USE_TESTNET = os.environ.get("BINANCE_TESTNET", "1") == "1"
 EXCHANGE = os.environ.get("EXCHANGE", "binance").lower()
-BINANCE_PORT = int(os.environ.get("BINANCE_PORT", "5051"))
+BINANCE_PORT = int(os.environ.get("BINANCE_PORT", "5052"))
 
 if not BINANCE_API_KEY or not BINANCE_API_SECRET:
     print("请设置环境变量 BINANCE_API_KEY 和 BINANCE_API_SECRET")
