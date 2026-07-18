@@ -293,5 +293,16 @@ MIT License. See [LICENSE](LICENSE).
 
 ---
 
+## 支持 / Support
+
+如果这个项目对你有帮助，欢迎打赏：
+
+EVM (ETH/BSC/Polygon/Arbitrum):
+```
+0x29f091DAA3dfee8100645ee24239bCC3ae174B42
+```
+
+---
+
 *Built for the community by [冰火岛](https://binghuodao.club). Use at your own risk — always test on testnet first.*
 *由冰火岛社区开发维护。请自行承担交易风险，务必先在 Testnet 测试。*
