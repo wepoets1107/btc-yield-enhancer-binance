@@ -325,10 +325,10 @@ def api_kline():
         # K 线数据始终从主网公共 API 拉取（Demo 的模拟数据不会实时更新）
         base = "https://api.binance.com/api"
         end = int(_time.time() * 1000)
-        start = end - 3 * 3600 * 1000
+        start = end - 365 * 5 * 60 * 1000  # 365根5分钟K线 ≈ 30小时
         resp = _req.get(f"{base}/v3/klines", params={
             "symbol": "BTCUSDT", "interval": "5m",
-            "startTime": start, "endTime": end, "limit": 150,
+            "startTime": start, "endTime": end, "limit": 500,
         }, timeout=10)
         klines = resp.json()
         if not isinstance(klines, list):
