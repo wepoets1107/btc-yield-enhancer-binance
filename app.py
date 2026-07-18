@@ -12,7 +12,7 @@ BTC 收益增强策略 - 币安交易所版 Flask Web 应用
     BINANCE_API_SECRET=xxx
     BINANCE_TESTNET=1
 
-前端：http://localhost:5050/btc-enhancer/
+前端：http://localhost:5052/
 """
 
 from __future__ import annotations
@@ -73,7 +73,7 @@ if not BINANCE_API_KEY or not BINANCE_API_SECRET:
 # ---------------------------------------------------------------------------
 # Flask + WebSocket
 # ---------------------------------------------------------------------------
-app = Flask(__name__, static_url_path='/btc-enhancer/static', static_folder='static')
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 sock = Sock(app)
 
 engine: StrategyEngine = None
@@ -98,7 +98,7 @@ def broadcast_state(state: dict):
                 ws_clients.discard(c)
 
 
-@sock.route("/btc-enhancer/ws")
+@sock.route("/ws")
 def ws_handler(ws):
     with ws_clients_lock:
         ws_clients.add(ws)
@@ -154,7 +154,7 @@ def _create_engine(state_callback=None):
 # API 路由（与 Deribit 版保持一致）
 # ---------------------------------------------------------------------------
 
-@app.route("/btc-enhancer/")
+@app.route("/")
 def index():
     html_path = os.path.join(os.path.dirname(__file__), "static", "dashboard.html")
     with open(html_path, "r", encoding="utf-8") as f:
@@ -165,7 +165,7 @@ def index():
     return resp
 
 
-@app.route("/btc-enhancer/api/status")
+@app.route("/api/status")
 def api_status():
     if engine is None:
         return jsonify({"error": "Strategy engine not initialized"}), 503
@@ -174,7 +174,7 @@ def api_status():
     return jsonify(state)
 
 
-@app.route("/btc-enhancer/api/init", methods=["POST"])
+@app.route("/api/init", methods=["POST"])
 def api_init():
     global engine
     with engine_lock:
@@ -190,7 +190,7 @@ def api_init():
     return jsonify({"success": True, "message": "Engine initialized", "status": engine.status})
 
 
-@app.route("/btc-enhancer/api/start", methods=["POST"])
+@app.route("/api/start", methods=["POST"])
 def api_start():
     global engine
     with engine_lock:
@@ -207,7 +207,7 @@ def api_start():
     })
 
 
-@app.route("/btc-enhancer/api/stop", methods=["POST"])
+@app.route("/api/stop", methods=["POST"])
 def api_stop():
     if engine is None:
         return jsonify({"error": "No strategy running"}), 400
@@ -215,7 +215,7 @@ def api_stop():
     return jsonify({"success": True, "message": "Strategy stopping"})
 
 
-@app.route("/btc-enhancer/api/params", methods=["GET", "POST"])
+@app.route("/api/params", methods=["GET", "POST"])
 def api_params():
     global engine
     if request.method == "GET":
@@ -267,7 +267,7 @@ def api_params():
     return jsonify({"success": True, "changed": changed})
 
 
-@app.route("/btc-enhancer/api/test-connection")
+@app.route("/api/test-connection")
 def api_test_connection():
     client = _create_api_client()
     info = client.check_connection()
@@ -289,14 +289,14 @@ def api_test_connection():
     return jsonify(info)
 
 
-@app.route("/btc-enhancer/api/credentials", methods=["GET"])
+@app.route("/api/credentials", methods=["GET"])
 def api_credentials():
     """返回当前 API 凭证信息（脱敏）"""
     masked = BINANCE_API_KEY[:4] + "****" if len(BINANCE_API_KEY) > 4 else "****"
     return jsonify({"client_id_masked": masked, "testnet": USE_TESTNET})
 
 
-@app.route("/btc-enhancer/api/config", methods=["GET", "POST"])
+@app.route("/api/config", methods=["GET", "POST"])
 def api_config():
     global engine
     if request.method == "GET":
@@ -317,13 +317,13 @@ def api_config():
     return jsonify({"success": True, "message": "Config updated"})
 
 
-@app.route("/btc-enhancer/api/kline")
+@app.route("/api/kline")
 def api_kline():
     """拉取 BTC K 线数据（通过币安公共 API，无需鉴权）"""
     import requests as _req, time as _time
     try:
-        use_testnet = os.environ.get("BINANCE_TESTNET", "1") == "1"
-        base = "https://demo-api.binance.com/api" if use_testnet else "https://api.binance.com/api"
+        # K 线数据始终从主网公共 API 拉取（Demo 的模拟数据不会实时更新）
+        base = "https://api.binance.com/api"
         end = int(_time.time() * 1000)
         start = end - 3 * 3600 * 1000
         resp = _req.get(f"{base}/v3/klines", params={
@@ -355,7 +355,7 @@ def api_kline():
 if __name__ == "__main__":
     print("=" * 60)
     print("  BTC 收益增强策略 (币安版) - Dashboard + WebSocket")
-    print("  http://localhost:5050")
+    print("  http://localhost:5052")
     print(f"  交易所: {EXCHANGE.upper()}  测试网: {USE_TESTNET}")
     print("=" * 60)
     app.run(host="127.0.0.1", port=BINANCE_PORT, debug=False)
