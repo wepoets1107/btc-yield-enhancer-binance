@@ -41,7 +41,6 @@
       crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
       rightPriceScale: { borderColor: "rgba(48,54,61,0.5)", scaleMargins: { top: 0.05, bottom: 0.2 } },
       timeScale: { borderColor: "rgba(48,54,61,0.5)", timeVisible: true, secondsVisible: false },
-      localization: { timeZone: "Asia/Shanghai" },
       handleScroll: false, handleScale: false,
       width: el.clientWidth, height: 280,
     });
@@ -84,7 +83,7 @@
       if (!data || data.error || !data.ticks || !data.ticks.length) return;
       var candles = [];
       for (var i = 0; i < data.ticks.length; i++) {
-        var t = Math.floor(data.ticks[i] / 1000);
+        var t = Math.floor(data.ticks[i] / 1000) + 28800;  // UTC+8
         var o = data.open[i], h = data.high[i], l = data.low[i], c = data.close[i];
         if (o && h && l && c) candles.push({ time: t, open: o, high: h, low: l, close: c });
       }
