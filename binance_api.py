@@ -73,15 +73,20 @@ class BinanceClient:
         return {"X-MBX-APIKEY": self.api_key}
 
     def _get(self, path: str, params: Optional[dict] = None, signed: bool = False) -> dict:
-        """GET 请求"""
+        """GET 请求（签名参数放 query string，严格排序）"""
         if params is None:
             params = {}
         if signed:
             params["timestamp"] = int(time.time() * 1000)
-            params["signature"] = self._sign(params)
-        url = f"{self.base_url}{path}"
+            query_sorted = "&".join(f"{k}={v}" for k, v in sorted(params.items()))
+            sig = self._sign(params)
+            url = f"{self.base_url}{path}?{query_sorted}&signature={sig}"
+        else:
+            url = f"{self.base_url}{path}"
+            if params:
+                url += "?" + "&".join(f"{k}={v}" for k, v in sorted(params.items()))
         try:
-            resp = requests.get(url, params=params, headers=self._headers(), timeout=20)
+            resp = requests.get(url, headers=self._headers(), timeout=20)
             data = resp.json()
             if resp.status_code != 200:
                 err_msg = data.get("msg", resp.text[:500])
