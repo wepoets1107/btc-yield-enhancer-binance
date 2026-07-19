@@ -150,6 +150,7 @@ class StrategyEngine:
                 "initial_total_usdc": self.initial_total_usdc,
                 "trades": self.trades[-200:],  # 保留最近 200 笔
                 "total_trades": self.total_trades,
+                "trading_pnl": self.total_value_usdc - self.initial_total_usdc,
                 "was_trading": self._trading_enabled,  # 重启后自动恢复交易
                 "config": self.cfg,  # 运行时配置（含 API 修改的下限/上限等）
                 "updated_at": datetime.now(BJT).isoformat(),
